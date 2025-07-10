@@ -1,0 +1,12 @@
+name: dooh-react-frontend
+metadata:
+  template: dooh-react-frontend@0.0.1-beta
+services:
+  web:
+    project: .
+    language: js
+    host: containerapp
+    docker:
+      path: ./Dockerfile
+      context: .
+      target: production
