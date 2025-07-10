@@ -1,9 +1,8 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { DOOHProvider } from './context/DOOHContext';
+import Navigation from './components/Navigation';
 import Dashboard from './components/Dashboard';
 import DigitalSignage from './components/DigitalSignage';
-import Navigation from './components/Navigation';
-import { DOOHProvider } from './context/DOOHContext';
 import './App.css';
 
 function App() {

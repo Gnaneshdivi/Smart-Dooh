@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import axios from 'axios';
 
 // API Configuration
@@ -136,7 +136,6 @@ interface DOOHProviderProps {
 
 export function DOOHProvider({ children }: DOOHProviderProps) {
   const [state, dispatch] = useReducer(doohReducer, initialState);
-  const [websocket, setWebsocket] = React.useState<WebSocket | null>(null);
 
   // Initialize WebSocket connection
   useEffect(() => {
@@ -187,8 +186,6 @@ export function DOOHProvider({ children }: DOOHProviderProps) {
         console.error('Error parsing WebSocket message:', error);
       }
     };
-
-    setWebsocket(ws);
 
     return () => {
       ws.close();
