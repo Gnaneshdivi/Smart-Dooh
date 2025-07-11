@@ -37,7 +37,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
     }
     
     try {
-      const wsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.hostname}:8000/ws`;
+      const wsUrl = import.meta.env.VITE_WS_URL || `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.hostname}/ws`;
       
       console.log(`🔌 Connecting to WebSocket: ${wsUrl}`);
       

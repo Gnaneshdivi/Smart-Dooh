@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # React Frontend Service
+  dooh-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: dooh-react-frontend
+    ports:
+      - "80:80"
+    environment:
+      # Environment variables for production
+      - NODE_ENV=production
+      # Add any other environment variables your app needs
+      # - REACT_APP_API_URL=https://your-api-url.com
+      # - REACT_APP_WS_URL=wss://your-websocket-url.com
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - dooh-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dooh-frontend.rule=Host(`localhost`)"
+      - "traefik.http.routers.dooh-frontend.entrypoints=web"
+      - "traefik.http.services.dooh-frontend.loadbalancer.server.port=80"
+
+  # Optional: Add a backend service if you have one
+  # dooh-backend:
+  #   image: your-backend-image:latest
+  #   container_name: dooh-backend
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     - NODE_ENV=production
+  #   restart: unless-stopped
+  #   networks:
+  #     - dooh-network
+  #   depends_on:
+  #     - dooh-database
+
+  # Optional: Add a database service if needed
+  # dooh-database:
+  #   image: postgres:15-alpine
+  #   container_name: dooh-postgres
+  #   environment:
+  #     - POSTGRES_DB=dooh_analytics
+  #     - POSTGRES_USER=dooh_user
+  #     - POSTGRES_PASSWORD=secure_password_here
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #     - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  #   ports:
+  #     - "5432:5432"
+  #   restart: unless-stopped
+  #   networks:
+  #     - dooh-network
+
+networks:
+  dooh-network:
+    driver: bridge
+    name: dooh-network
+
+# Optional: Define volumes for persistent data
+# volumes:
+#   postgres_data:
+#     driver: local
