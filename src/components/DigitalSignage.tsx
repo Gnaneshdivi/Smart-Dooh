@@ -74,12 +74,15 @@ const DigitalSignage: React.FC = () => {
   };
 
   const getAdImageUrl = (adType: string): string => {
+    // Updated mapping to include new video assets
     const adMap: Record<string, string> = {
-      'man': '/ads/man.gif',
+      'man': '/ads/man.gif',           // single male
+      'multiple': '/ads/multiple.mp4', // multiple males
       'male': '/ads/man.gif',
-      'woman': '/ads/woman.gif', 
-      'female': '/ads/woman.gif',
-      'neutral': '/ads/neutral.gif',
+      'female': '/ads/female.mp4',     // single female
+      'woman': '/ads/woman.gif',       // legacy single female
+      'fashion': '/ads/fashion.mp4',   // multiple females
+      'neutral': '/ads/neutral.gif',   // no audience / mixed
     };
     return adMap[adType] || adMap['neutral'];
   };
@@ -87,9 +90,11 @@ const DigitalSignage: React.FC = () => {
   const getAdDisplayName = (adType: string): string => {
     const nameMap: Record<string, string> = {
       'man': 'Male Targeted',
+      'multiple': 'Group of Males',
       'male': 'Male Targeted',
-      'woman': 'Female Targeted',
       'female': 'Female Targeted',
+      'woman': 'Female Targeted',
+      'fashion': 'Group of Females',
       'neutral': 'Neutral Content',
     };
     return nameMap[adType] || 'Unknown';
@@ -218,53 +223,51 @@ const DigitalSignage: React.FC = () => {
           alignItems: 'center',
           justifyContent: 'center'
         }}>
-          {/* GIF/MP4 Display - Responsive sizing */}
-          <img 
-            src={getAdImageUrl(state.currentAd)}
-            alt={getAdDisplayName(state.currentAd)}
-            className="ad-media"
-            style={{
-              // Responsive sizing based on screen orientation and ad type
-              width: (() => {
-                const isVertical = window.innerHeight > window.innerWidth;
-                if (state.currentAd === 'neutral') {
-                  return isVertical ? '60%' : '30%';
-                }
-                return isVertical ? '90%' : '100%';
-              })(),
-              height: (() => {
-                const isVertical = window.innerHeight > window.innerWidth;
-                if (state.currentAd === 'neutral') {
-                  return isVertical ? '40%' : '50%';
-                }
-                return isVertical ? '70%' : '100%';
-              })(),
-              objectFit: 'contain', // Maintain aspect ratio
-              transition: 'width 0.3s ease, height 0.3s ease'
-            }}
-            onError={(e) => {
-              // If GIF fails, try MP4
-              const target = e.target as HTMLImageElement;
-              const mp4Url = target.src.replace('.gif', '.mp4');
-              if (!target.src.includes('.mp4')) {
-                target.src = mp4Url;
-              } else {
-                // If both fail, show fallback placeholder
-                target.style.display = 'none';
-                const fallback = target.nextElementSibling as HTMLElement;
-                if (fallback) fallback.style.display = 'flex';
-              }
-            }}
-            onLoad={() => {
-              // Hide fallback if media loads successfully
-              const img = document.querySelector('.ad-media') as HTMLElement;
-              const fallback = document.querySelector('.ad-fallback') as HTMLElement;
-              if (img && fallback) {
-                img.style.display = 'block';
-                fallback.style.display = 'none';
-              }
-            }}
-          />
+          {/* Dynamic media element (GIF or MP4) */}
+          {(() => {
+            const src = getAdImageUrl(state.currentAd);
+            const isVideo = src.endsWith('.mp4');
+            const isVertical = window.innerHeight > window.innerWidth;
+            const mediaWidth = state.currentAd === 'neutral'
+              ? (isVertical ? '60%' : '30%')
+              : (isVertical ? '90%' : '100%');
+            const mediaHeight = state.currentAd === 'neutral'
+              ? (isVertical ? '40%' : '50%')
+              : (isVertical ? '70%' : '100%');
+
+            if (isVideo) {
+              return (
+                <video
+                  src={src}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="ad-media"
+                  style={{
+                    width: mediaWidth,
+                    height: mediaHeight,
+                    objectFit: 'contain',
+                    transition: 'width 0.3s ease, height 0.3s ease'
+                  }}
+                />
+              );
+            }
+
+            return (
+              <img
+                src={src}
+                alt={getAdDisplayName(state.currentAd)}
+                className="ad-media"
+                style={{
+                  width: mediaWidth,
+                  height: mediaHeight,
+                  objectFit: 'contain',
+                  transition: 'width 0.3s ease, height 0.3s ease'
+                }}
+              />
+            );
+          })()}
           
           {/* Fallback placeholder if media files don't exist - Responsive */}
           <div className={`ad-fallback ad-placeholder ad-${state.currentAd}`} style={{ 
