@@ -82,7 +82,8 @@ const DigitalSignage: React.FC = () => {
       'female': '/ads/female.mp4',     // single female
       'woman': '/ads/woman.gif',       // legacy single female
       'fashion': '/ads/fashion.mp4',   // multiple females
-      'neutral': '/ads/neutral.gif',   // no audience / mixed
+      'neutral': '/ads/neutral.gif', 
+        // no audience / mixed
     };
     return adMap[adType] || adMap['neutral'];
   };
